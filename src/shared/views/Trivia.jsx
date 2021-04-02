@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Card } from "../organisms/Card";
+import { fetchQuestions } from "../services/triviaService";
 
 const counterStyle = {
   backgroundColor: "#D9EAF8",
@@ -12,18 +13,62 @@ const buttonStyle = {
   fontSize: "20px",
 };
 const buttonNavigation = {
-  align: "center",
+  display: "flex",
+  justifyContent: "center",
 };
+
 export const Trivia = () => {
-  return (
-    <React.Fragment>
-      <p style={counterStyle}>COUNTER: 0/10</p>
-      <Card />
-      <div style={buttonNavigation}>
-        <button style={buttonStyle}>Previous</button>
-        <button style={buttonStyle}>Answer</button>
-        <button style={buttonStyle}>Next</button>
-      </div>
-    </React.Fragment>
-  );
+  const [questions, updateQuestions] = useState();
+  const [isLoading, setLoading] = useState(true);
+  const [questionNo, updateQuestionNo] = useState(0);
+  const [score, updateScore] = useState(0);
+
+  useEffect(() => {
+    const receiveQuestions = async () => {
+      updateQuestions(await fetchQuestions());
+
+      setLoading(false);
+    };
+    receiveQuestions();
+  }, []);
+
+  //CALLBACK
+  const handleCallback = (isCorrect) => {
+    if (isCorrect) {
+      updateScore(score + 1);
+    }
+  };
+
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
+  if (!isLoading) {
+    console.log(questions);
+    return (
+      <React.Fragment>
+        <p style={counterStyle}>COUNTER: {score}/10</p>
+        <Card
+          question={questions[questionNo].question}
+          answers={questions[questionNo].incorrect_answers}
+          correctAnswer={questions[questionNo].correct_answer}
+          isCorrect={handleCallback}
+        />
+        <div style={buttonNavigation}>
+          <button
+            style={buttonStyle}
+            onClick={() => updateQuestionNo(questionNo - 1)}
+          >
+            Previous
+          </button>
+          <button style={buttonStyle}>Answer</button>
+          <button
+            style={buttonStyle}
+            onClick={() => updateQuestionNo(questionNo + 1)}
+          >
+            Next
+          </button>
+        </div>
+      </React.Fragment>
+    );
+  }
 };

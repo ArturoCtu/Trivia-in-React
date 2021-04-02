@@ -7,16 +7,28 @@ const divStyle = {
   borderRadius: "15px",
 };
 
-export const Card = () => {
+export const Card = ({ question, answers, correctAnswer, isCorrect }) => {
+  const submitAnswer = (selectedAnswer) => {
+    if (selectedAnswer === correctAnswer) {
+      isCorrect(true);
+      console.log("correct");
+    } else {
+      isCorrect(false);
+      console.log("incorrect");
+    }
+  };
+
   return (
     <React.Fragment>
       <div style={divStyle}>
-        <h2> QUESTION </h2>
+        <h2> {question} </h2>
 
-        <p> ANSWER </p>
-        <p> ANSWER </p>
-        <p> ANSWER </p>
-        <p> ANSWER </p>
+        <p> {correctAnswer} </p>
+        {answers.map((answer, index) => (
+          <p key={index} onClick={() => submitAnswer(answer)}>
+            {answer}
+          </p>
+        ))}
       </div>
     </React.Fragment>
   );
